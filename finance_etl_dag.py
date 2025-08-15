@@ -5,6 +5,7 @@ from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 from airflow.operators.python import PythonOperator
 from airflow.models import Variable
 import pandas as pd
+import logging
 
 from my_etl_utils import extract_data, transform_data, load_data
 
@@ -15,7 +16,18 @@ def transform_task(**kwargs):
     db_path = kwargs["db_path"]
     table_name = kwargs["table_name"]
     extracted_rows = ti.xcom_pull(task_ids="extract_finance_data")
-    df = pd.DataFrame(extracted_rows)
+    if not extracted_rows:
+        df = pd.DataFrame(columns=['id','date','amount','category','description'])
+    elif isinstance(extracted_rows[0], dict):
+        df = pd.DataFrame(extracted_rows)
+    else: 
+        df = pd.DataFrame(
+            extracted_rows,
+            columns=['id', 'date', 'amount', 'category', 'description']
+        )
+    logging.info(f"Linhas extraídas: {len(df)}")
+    logging.info(f"Colunas extraídas: {df.columns}")
+    logging.info(f"Exemplo de dados extraídos: {df.head()}")
     return transform_data(df, transformation_type, db_path=db_path, table_name=table_name)
 
 def load_task(ti, db_path, table):
