@@ -55,7 +55,7 @@ with DAG(
         sql="""
         SELECT * 
         FROM transactions 
-        WHERE strftime('%Y-%m', date) <= '{{ macros.datetime.strftime(data_interval_start, "%Y-%m") }}'
+        WHERE strftime('%Y-%m', date) = '{{ data_interval_start | ds_format("%Y-%m") }}'
         """,
         do_xcom_push=True,
     )
@@ -65,7 +65,7 @@ with DAG(
         python_callable=transform_task,
         op_kwargs={
             'transformation_type': 'aggregate',
-            'db_path': Variable.get('finance_db_path'),
+            'db_path': Variable.get('finance_db_path', default_var='database/personal_finance.db'),
             'table_name': 'transactions'
         },
     )
@@ -74,7 +74,7 @@ with DAG(
         task_id='load_finance_data',
         python_callable=load_task,
         op_kwargs={
-            'db_path': Variable.get('finance_db_path'),
+            'db_path': Variable.get('finance_db_path', default_var='database/personal_finance.db'),
             'table': 'processed_transactions'
         },
     )

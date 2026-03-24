@@ -7,8 +7,10 @@ from datetime import datetime, timedelta
 fake = Faker()
 Faker.seed(42)
 
+import os
+
 # Connect to SQLite database
-db_path = "/home/luizfp22/projects/data-generation-project/Finance-Project/database/personal_finance.db"
+db_path = os.path.join(os.path.dirname(__file__), "database", "personal_finance.db")
 conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 

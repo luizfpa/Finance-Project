@@ -6,8 +6,10 @@ from my_etl_utils import extract_data, transform_data, load_data
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+import os
+
 # Database paths
-finance_db_path = "/home/luizfp22/projects/data-generation-project/Finance-Project/database/personal_finance.db"
+finance_db_path = os.path.join(os.path.dirname(__file__), "database", "personal_finance.db")
 
 def test_etl_finance():
     """Tests the ETL for the finance database."""
